@@ -3,16 +3,21 @@ extends VBoxContainer
 @onready var new_password_field: LineEdit = $NewPassword
 @onready var confirm_field: LineEdit      = $Passwowrd2
 @onready var submit_button: Button        = $Submit
-var error_label: Label   = null
-var success_label: Label = null
+var error_label   : Label = null
+var success_label : Label = null
 
-const LOGIN_SCENE := "res://screens/login.tscn"
+const LOGIN_SCENE : String = "res://screens/login.tscn"
+
+const EYE_OPEN   : String = "res://icons/eye.png"
+const EYE_CLOSED : String = "res://icons/eye-closed.png"
 
 func _ready() -> void:
 	new_password_field.secret = true
 	new_password_field.placeholder_text = "New Password"
 	confirm_field.secret = true
 	confirm_field.placeholder_text = "Confirm New Password"
+	new_password_field.right_icon = null
+	confirm_field.right_icon      = null
 
 	_setup_eye_toggle(new_password_field)
 	_setup_eye_toggle(confirm_field)
@@ -26,19 +31,37 @@ func _ready() -> void:
 	_ensure_labels()
 
 func _setup_eye_toggle(field: LineEdit) -> void:
-	var eye = load("res://icons/eye.png") as Texture2D
-	if eye == null:
+	var eye_closed : Texture2D = load(EYE_CLOSED) as Texture2D
+	var eye_open   : Texture2D = load(EYE_OPEN)   as Texture2D
+	if eye_closed == null or eye_open == null:
 		return
-	field.right_icon = eye
-	field.secret = true
-	field.gui_input.connect(func(event: InputEvent) -> void:
-		if not (event is InputEventMouseButton):
-			return
-		if not (event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
-			return
-		if event.position.x < field.size.x - 40.0:
-			return
+
+	var btn := Button.new()
+	btn.flat       = true
+	btn.focus_mode = Control.FOCUS_NONE
+	btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	btn.icon        = eye_closed
+	btn.expand_icon = true
+	btn.add_theme_constant_override("icon_max_width", 24)
+	btn.modulate = Color(1, 1, 1, 0.45)
+
+	var style := StyleBoxEmpty.new()
+	btn.add_theme_stylebox_override("normal",   style)
+	btn.add_theme_stylebox_override("hover",    style)
+	btn.add_theme_stylebox_override("pressed",  style)
+	btn.add_theme_stylebox_override("focus",    style)
+	btn.add_theme_stylebox_override("disabled", style)
+
+	btn.set_anchors_and_offsets_preset(Control.PRESET_CENTER_RIGHT)
+	btn.offset_right  = -4
+	btn.offset_left   = btn.offset_right - 40
+	btn.offset_top    = -20
+	btn.offset_bottom = 20
+	field.add_child(btn)
+
+	btn.pressed.connect(func() -> void:
 		field.secret = not field.secret
+		btn.icon = eye_closed if field.secret else eye_open
 	)
 
 func _ensure_labels() -> void:
@@ -67,8 +90,8 @@ func _on_submit_pressed() -> void:
 	_attempt_change()
 
 func _attempt_change() -> void:
-	var new_pass := new_password_field.text
-	var confirm  := confirm_field.text
+	var new_pass : String = new_password_field.text
+	var confirm  : String = confirm_field.text
 	if new_pass.is_empty() or confirm.is_empty():
 		_show_error("Please fill in both fields.")
 		return

@@ -7,8 +7,12 @@ extends VBoxContainer
 @onready var login_label: Label       = $Label
 var error_label: Label = null
 
-const HOME_SCENE  := "res://screens/home.tscn"
-const LOGIN_SCENE := "res://screens/login.tscn"
+const HOME_SCENE     : String = "res://screens/home.tscn"
+const LOGIN_SCENE    : String = "res://screens/login.tscn"
+const CHAR_SEL_SCENE : String = "res://screens/character_select.tscn"
+
+const EYE_OPEN   : String = "res://icons/eye.png"
+const EYE_CLOSED : String = "res://icons/eye-closed.png"
 
 func _ready() -> void:
 	password_field.secret = true
@@ -16,6 +20,8 @@ func _ready() -> void:
 	confirm_field.secret = true
 	confirm_field.placeholder_text = "Confirm Password"
 	email_field.placeholder_text   = "Email"
+	password_field.right_icon = null
+	confirm_field.right_icon  = null
 
 	login_label.mouse_filter = Control.MOUSE_FILTER_STOP
 	login_label.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
@@ -25,8 +31,8 @@ func _ready() -> void:
 
 	signup_button.pressed.connect(_on_signup_pressed)
 	login_label.gui_input.connect(_on_login_label_input)
-	email_field.text_submitted.connect(func(_t): password_field.grab_focus())
-	password_field.text_submitted.connect(func(_t): confirm_field.grab_focus())
+	email_field.text_submitted.connect(func(_t: String) -> void: password_field.grab_focus())
+	password_field.text_submitted.connect(func(_t: String) -> void: confirm_field.grab_focus())
 	confirm_field.text_submitted.connect(_on_confirm_submitted)
 
 	AuthManager.signup_success.connect(_on_signup_success)
@@ -35,19 +41,37 @@ func _ready() -> void:
 	_ensure_error_label()
 
 func _setup_eye_toggle(field: LineEdit) -> void:
-	var eye = load("res://icons/eye.png") as Texture2D
-	if eye == null:
+	var eye_closed : Texture2D = load(EYE_CLOSED) as Texture2D
+	var eye_open   : Texture2D = load(EYE_OPEN)   as Texture2D
+	if eye_closed == null or eye_open == null:
 		return
-	field.right_icon = eye
-	field.secret = true
-	field.gui_input.connect(func(event: InputEvent) -> void:
-		if not (event is InputEventMouseButton):
-			return
-		if not (event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
-			return
-		if event.position.x < field.size.x - 40.0:
-			return
+
+	var btn := Button.new()
+	btn.flat       = true
+	btn.focus_mode = Control.FOCUS_NONE
+	btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	btn.icon        = eye_closed
+	btn.expand_icon = true
+	btn.add_theme_constant_override("icon_max_width", 24)
+	btn.modulate = Color(1, 1, 1, 0.45)
+
+	var style := StyleBoxEmpty.new()
+	btn.add_theme_stylebox_override("normal",   style)
+	btn.add_theme_stylebox_override("hover",    style)
+	btn.add_theme_stylebox_override("pressed",  style)
+	btn.add_theme_stylebox_override("focus",    style)
+	btn.add_theme_stylebox_override("disabled", style)
+
+	btn.set_anchors_and_offsets_preset(Control.PRESET_CENTER_RIGHT)
+	btn.offset_right  = -4
+	btn.offset_left   = btn.offset_right - 40
+	btn.offset_top    = -20
+	btn.offset_bottom = 20
+	field.add_child(btn)
+
+	btn.pressed.connect(func() -> void:
 		field.secret = not field.secret
+		btn.icon = eye_closed if field.secret else eye_open
 	)
 
 func _ensure_error_label() -> void:
@@ -70,9 +94,9 @@ func _on_signup_pressed() -> void:
 	_attempt_signup()
 
 func _attempt_signup() -> void:
-	var email    := email_field.text.strip_edges()
-	var password := password_field.text
-	var confirm  := confirm_field.text
+	var email    : String = email_field.text.strip_edges()
+	var password : String = password_field.text
+	var confirm  : String = confirm_field.text
 	if email.is_empty() or password.is_empty() or confirm.is_empty():
 		_show_error("Please fill in all fields.")
 		return
@@ -90,7 +114,7 @@ func _attempt_signup() -> void:
 func _on_signup_success(_user: Dictionary) -> void:
 	signup_button.disabled = false
 	signup_button.text = "Sign Up"
-	get_tree().change_scene_to_file.call_deferred(HOME_SCENE)
+	get_tree().change_scene_to_file.call_deferred(CHAR_SEL_SCENE)
 
 func _on_signup_failed(reason: String) -> void:
 	signup_button.disabled = false

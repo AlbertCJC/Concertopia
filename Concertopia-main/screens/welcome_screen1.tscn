@@ -1,166 +1,165 @@
 [gd_scene format=3 uid="uid://d2qej3t6jiq6o"]
-	
-	[ext_resource type="Texture2D" uid="uid://cpgi6vxh6v2qo" path="res://icons/h.png" id="1_hwurc"]
-	[ext_resource type="Script" uid="uid://dplfphq71djqy" path="res://scripts/welcome_screen1.gd" id="2_h7l4m"]
-	[ext_resource type="FontFile" uid="uid://colg6fptsubg1" path="res://Pixelify_Sans/static/PixelifySans-Bold.ttf" id="2_m4kiw"]
-	[ext_resource type="FontFile" uid="uid://dmh160p0qk05g" path="res://font/Montserrat/static/Montserrat-SemiBold.ttf" id="3_kvxdi"]
-	[ext_resource type="Texture2D" uid="uid://dvh26cf4wydw7" path="res://icons/user.png" id="4_svg5r"]
-	[ext_resource type="Texture2D" uid="uid://bi5witvq4eo6v" path="res://icons/padlock.png" id="5_ru758"]
-	[ext_resource type="FontFile" uid="uid://cqmtiniotsuqq" path="res://font/Montserrat/static/Montserrat-Bold.ttf" id="6_sboab"]
-	[ext_resource type="Texture2D" uid="uid://dya60t1wx5nt0" path="res://icons/google.png" id="7_fi8x0"]
-	[ext_resource type="Texture2D" uid="uid://dcwl2mw6m5kjf" path="res://icons/apple-logo (1).png" id="8_6viwk"]
-	[ext_resource type="Texture2D" uid="uid://y7awvfpfwmhy" path="res://icons/facebook.png" id="9_4mnyg"]
-	
-	[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_itgl0"]
-	content_margin_left = 50.0
-	bg_color = Color(1, 1, 1, 1)
-	corner_radius_top_left = 20
-	corner_radius_top_right = 20
-	corner_radius_bottom_right = 20
-	corner_radius_bottom_left = 20
-	
-	[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g2x45"]
-	content_margin_left = 50.0
-	content_margin_right = 16.0
-	bg_color = Color(1, 1, 1, 1)
-	corner_radius_top_left = 20
-	corner_radius_top_right = 20
-	corner_radius_bottom_right = 20
-	corner_radius_bottom_left = 20
-	
-	[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_tc5jd"]
-	load_path = "res://.godot/imported/eye.png-93c8bcf8a12f63410ce2c5f2c2c53fbc.ctex"
-	
-	[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u2dqi"]
-	bg_color = Color(0.96862745, 0.57254905, 0.7176471, 1)
-	corner_radius_top_left = 20
-	corner_radius_top_right = 20
-	corner_radius_bottom_right = 20
-	corner_radius_bottom_left = 20
-	
-	[node name="Control" type="Control" unique_id=1861233806]
-	custom_minimum_size = Vector2(50, 50)
-	layout_mode = 3
-	anchors_preset = 15
-	anchor_right = 1.0
-	anchor_bottom = 1.0
-	grow_horizontal = 2
-	grow_vertical = 2
-	script = ExtResource("2_h7l4m")
-	
-	[node name="TextureRect" type="TextureRect" parent="." unique_id=20678281]
-	layout_mode = 1
-	anchors_preset = 15
-	anchor_right = 1.0
-	anchor_bottom = 1.0
-	grow_horizontal = 2
-	grow_vertical = 2
-	texture = ExtResource("1_hwurc")
-	stretch_mode = 6
-	
-	[node name="CenterContainer" type="CenterContainer" parent="." unique_id=28366111]
-	layout_mode = 0
-	offset_left = 3.0
-	offset_top = 3.0
-	offset_right = 1153.0
-	offset_bottom = 651.0
-	
-	[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=762727008]
-	custom_minimum_size = Vector2(234, 37)
-	layout_mode = 2
-	theme_override_constants/separation = 11
-	
-	[node name="Log In" type="Label" parent="CenterContainer/VBoxContainer" unique_id=56975817]
-	layout_mode = 2
-	size_flags_horizontal = 4
-	size_flags_vertical = 0
-	theme_override_fonts/font = ExtResource("2_m4kiw")
-	theme_override_font_sizes/font_size = 36
-	text = "Log In"
-	
-	[node name="Control" type="Control" parent="CenterContainer/VBoxContainer" unique_id=1943035548]
-	custom_minimum_size = Vector2(0, 40)
-	layout_mode = 2
-	
-	[node name="Email" type="LineEdit" parent="CenterContainer/VBoxContainer" unique_id=1468297899]
-	custom_minimum_size = Vector2(300, 50)
-	layout_mode = 2
-	theme_override_colors/font_color = Color(0, 0, 0, 1)
-	theme_override_colors/font_placeholder_color = Color(0.4, 0.4, 0.4, 0.6)
-	theme_override_fonts/font = ExtResource("3_kvxdi")
-	theme_override_styles/normal = SubResource("StyleBoxFlat_itgl0")
-	placeholder_text = "Email"
-	
-	[node name="user icon" type="TextureRect" parent="CenterContainer/VBoxContainer/Email" unique_id=436267800]
-	custom_minimum_size = Vector2(25, 25)
-	layout_mode = 0
-	offset_left = 15.0
-	offset_top = 11.0
-	offset_right = 40.0
-	offset_bottom = 36.0
-	texture = ExtResource("4_svg5r")
-	expand_mode = 1
-	stretch_mode = 5
-	
-	[node name="Passwowrd" type="LineEdit" parent="CenterContainer/VBoxContainer" unique_id=683891945]
-	custom_minimum_size = Vector2(300, 50)
-	layout_mode = 2
-	theme_override_colors/font_color = Color(0, 0, 0, 1)
-	theme_override_colors/font_placeholder_color = Color(0.4, 0.4, 0.4, 0.6)
-	theme_override_fonts/font = ExtResource("3_kvxdi")
-	theme_override_styles/normal = SubResource("StyleBoxFlat_g2x45")
-	placeholder_text = "Password"
-	right_icon = SubResource("CompressedTexture2D_tc5jd")
-	icon_expand_mode = 1
-	
-	[node name="TextureRect" type="TextureRect" parent="CenterContainer/VBoxContainer/Passwowrd" unique_id=1803314476]
-	layout_mode = 0
-	offset_left = 14.0
-	offset_top = 10.0
-	offset_right = 39.0
-	offset_bottom = 36.0
-	texture = ExtResource("5_ru758")
-	expand_mode = 1
-	stretch_mode = 5
-	
-	[node name="Log In2" type="Button" parent="CenterContainer/VBoxContainer" unique_id=853501841]
-	custom_minimum_size = Vector2(300, 50)
-	layout_mode = 2
-	theme_override_colors/font_color = Color(1, 1, 1, 1)
-	theme_override_fonts/font = ExtResource("6_sboab")
-	theme_override_styles/normal = SubResource("StyleBoxFlat_u2dqi")
-	text = "Log In"
-	
-	[node name="continue" type="Label" parent="CenterContainer/VBoxContainer" unique_id=783653274]
-	layout_mode = 2
-	size_flags_horizontal = 4
-	text = "or continue with"
-	
-	[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer" unique_id=1064138403]
-	custom_minimum_size = Vector2(300, 30)
-	layout_mode = 2
-	size_flags_horizontal = 4
-	size_flags_vertical = 4
-	theme_override_constants/separation = 15
-	alignment = 1
-	
-	[node name="google" type="TextureRect" parent="CenterContainer/VBoxContainer/HBoxContainer" unique_id=1355760725]
-	layout_mode = 2
-	texture = ExtResource("7_fi8x0")
-	expand_mode = 3
-	
-	[node name="apple" type="TextureRect" parent="CenterContainer/VBoxContainer/HBoxContainer" unique_id=1521163421]
-	layout_mode = 2
-	texture = ExtResource("8_6viwk")
-	expand_mode = 3
-	
-	[node name="facebook" type="TextureRect" parent="CenterContainer/VBoxContainer/HBoxContainer" unique_id=2133851674]
-	layout_mode = 2
-	texture = ExtResource("9_4mnyg")
-	expand_mode = 3
-	
-	[node name="Label" type="Label" parent="CenterContainer/VBoxContainer" unique_id=338709710]
-	layout_mode = 2
-	size_flags_horizontal = 4
-	text = "Create an Account Signup"
-	
+
+[ext_resource type="Texture2D" uid="uid://cpgi6vxh6v2qo" path="res://icons/h.png" id="1_hwurc"]
+[ext_resource type="Script" uid="uid://dplfphq71djqy" path="res://scripts/welcome_screen1.gd" id="2_h7l4m"]
+[ext_resource type="FontFile" uid="uid://colg6fptsubg1" path="res://Pixelify_Sans/static/PixelifySans-Bold.ttf" id="2_m4kiw"]
+[ext_resource type="FontFile" uid="uid://dmh160p0qk05g" path="res://font/Montserrat/static/Montserrat-SemiBold.ttf" id="3_kvxdi"]
+[ext_resource type="Texture2D" uid="uid://dvh26cf4wydw7" path="res://icons/user.png" id="4_svg5r"]
+[ext_resource type="Texture2D" uid="uid://bi5witvq4eo6v" path="res://icons/padlock.png" id="5_ru758"]
+[ext_resource type="FontFile" uid="uid://cqmtiniotsuqq" path="res://font/Montserrat/static/Montserrat-Bold.ttf" id="6_sboab"]
+[ext_resource type="Texture2D" uid="uid://dya60t1wx5nt0" path="res://icons/google.png" id="7_fi8x0"]
+[ext_resource type="Texture2D" uid="uid://dcwl2mw6m5kjf" path="res://icons/apple-logo (1).png" id="8_6viwk"]
+[ext_resource type="Texture2D" uid="uid://y7awvfpfwmhy" path="res://icons/facebook.png" id="9_4mnyg"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_itgl0"]
+content_margin_left = 50.0
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g2x45"]
+content_margin_left = 50.0
+content_margin_right = 16.0
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_tc5jd"]
+load_path = "res://.godot/imported/eye.png-93c8bcf8a12f63410ce2c5f2c2c53fbc.ctex"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u2dqi"]
+bg_color = Color(0.96862745, 0.57254905, 0.7176471, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[node name="Control" type="Control" unique_id=1861233806]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_h7l4m")
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=20678281]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_hwurc")
+stretch_mode = 6
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=28366111]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 1153.0
+offset_bottom = 651.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=762727008]
+custom_minimum_size = Vector2(234, 37)
+layout_mode = 2
+theme_override_constants/separation = 11
+
+[node name="Log In" type="Label" parent="CenterContainer/VBoxContainer" unique_id=56975817]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+theme_override_fonts/font = ExtResource("2_m4kiw")
+theme_override_font_sizes/font_size = 36
+text = "Log In"
+
+[node name="Control" type="Control" parent="CenterContainer/VBoxContainer" unique_id=1943035548]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="Email" type="LineEdit" parent="CenterContainer/VBoxContainer" unique_id=1468297899]
+custom_minimum_size = Vector2(300, 50)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_placeholder_color = Color(0.4, 0.4, 0.4, 0.6)
+theme_override_fonts/font = ExtResource("3_kvxdi")
+theme_override_styles/normal = SubResource("StyleBoxFlat_itgl0")
+placeholder_text = "Email"
+
+[node name="user icon" type="TextureRect" parent="CenterContainer/VBoxContainer/Email" unique_id=436267800]
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 0
+offset_left = 15.0
+offset_top = 11.0
+offset_right = 40.0
+offset_bottom = 36.0
+texture = ExtResource("4_svg5r")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Passwowrd" type="LineEdit" parent="CenterContainer/VBoxContainer" unique_id=683891945]
+custom_minimum_size = Vector2(300, 50)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_placeholder_color = Color(0.4, 0.4, 0.4, 0.6)
+theme_override_fonts/font = ExtResource("3_kvxdi")
+theme_override_styles/normal = SubResource("StyleBoxFlat_g2x45")
+placeholder_text = "Password"
+right_icon = SubResource("CompressedTexture2D_tc5jd")
+icon_expand_mode = 1
+
+[node name="TextureRect" type="TextureRect" parent="CenterContainer/VBoxContainer/Passwowrd" unique_id=1803314476]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 10.0
+offset_right = 39.0
+offset_bottom = 36.0
+texture = ExtResource("5_ru758")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Log In2" type="Button" parent="CenterContainer/VBoxContainer" unique_id=853501841]
+custom_minimum_size = Vector2(300, 50)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("6_sboab")
+theme_override_styles/normal = SubResource("StyleBoxFlat_u2dqi")
+text = "Log In"
+
+[node name="continue" type="Label" parent="CenterContainer/VBoxContainer" unique_id=783653274]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "or continue with"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer" unique_id=1064138403]
+custom_minimum_size = Vector2(300, 30)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 15
+alignment = 1
+
+[node name="google" type="TextureRect" parent="CenterContainer/VBoxContainer/HBoxContainer" unique_id=1355760725]
+layout_mode = 2
+texture = ExtResource("7_fi8x0")
+expand_mode = 3
+
+[node name="apple" type="TextureRect" parent="CenterContainer/VBoxContainer/HBoxContainer" unique_id=1521163421]
+layout_mode = 2
+texture = ExtResource("8_6viwk")
+expand_mode = 3
+
+[node name="facebook" type="TextureRect" parent="CenterContainer/VBoxContainer/HBoxContainer" unique_id=2133851674]
+layout_mode = 2
+texture = ExtResource("9_4mnyg")
+expand_mode = 3
+
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer" unique_id=338709710]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Create an Account Signup"

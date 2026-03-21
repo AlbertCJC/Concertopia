@@ -1,81 +1,180 @@
 extends Control
 
-@onready var next_button: Button       = $CenterContainer/VBoxContainer/"Log In2"
-@onready var title_label: Label        = $CenterContainer/VBoxContainer/"Log In"
-@onready var email_field: LineEdit     = $CenterContainer/VBoxContainer/Email
-@onready var pass_field: LineEdit      = $CenterContainer/VBoxContainer/Passwowrd
-@onready var signup_label: Label       = $CenterContainer/VBoxContainer/Label
-@onready var or_label: Label           = $CenterContainer/VBoxContainer/continue
-@onready var social_box: HBoxContainer = $CenterContainer/VBoxContainer/HBoxContainer
-
-const DOT_ACTIVE   := Color(1.0, 1.0, 1.0, 1.0)
-const DOT_INACTIVE := Color(1.0, 1.0, 1.0, 0.3)
-const LOGIN_SCENE  := "res://screens/login.tscn"
-const PREV_SCENE   := "res://screens/welcome_screen2.tscn"
+const LOGIN_SCENE        : String = "res://screens/login.tscn"
+const PREV_SCENE         : String = "res://screens/welcome_screen2.tscn"
+const WELCOME_BACK_SCENE : String = "res://screens/welcome_back.tscn"
+const CHAR_SEL_SCENE     : String = "res://screens/character_select.tscn"
 
 func _ready() -> void:
-	title_label.text = "🎟️  Never Miss a Show"
-	next_button.text = "Get Started"
+	_build_ui()
 
-	email_field.visible = false
-	pass_field.visible  = false
-	or_label.visible    = false
-	social_box.visible  = false
+func _build_ui() -> void:
+	var pixel_font := load("res://Pixelify_Sans/static/PixelifySans-Bold.ttf") as FontFile
 
-	signup_label.text = "Already have an account? Log In"
-	signup_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	signup_label.mouse_filter = Control.MOUSE_FILTER_STOP
-	signup_label.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	signup_label.gui_input.connect(_on_login_label_input)
+	var bg := ColorRect.new()
+	bg.color = Color(0, 0, 0)
+	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(bg)
 
-	var subtitle := Label.new()
-	subtitle.text = "Get personalised recommendations,\nset reminders, and book in seconds."
-	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	subtitle.add_theme_color_override("font_color", Color(1, 1, 1, 0.8))
-	$CenterContainer/VBoxContainer.add_child(subtitle)
-	$CenterContainer/VBoxContainer.move_child(subtitle, title_label.get_index() + 1)
+	var centre := VBoxContainer.new()
+	centre.alignment = BoxContainer.ALIGNMENT_CENTER
+	centre.add_theme_constant_override("separation", 14)
+	centre.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	centre.offset_left   = 40
+	centre.offset_right  = -40
+	centre.offset_top    = 20
+	centre.offset_bottom = -64
+	centre.mouse_filter  = Control.MOUSE_FILTER_IGNORE
+	add_child(centre)
 
-	var back_label := Label.new()
-	back_label.text = "← Back"
-	back_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	back_label.add_theme_color_override("font_color", Color(1, 1, 1, 0.5))
-	back_label.mouse_filter = Control.MOUSE_FILTER_STOP
-	back_label.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	back_label.gui_input.connect(_on_back_input)
-	$CenterContainer/VBoxContainer.add_child(back_label)
-	$CenterContainer/VBoxContainer.move_child(back_label, next_button.get_index() + 1)
+	var logo := Label.new()
+	logo.text = "ConcerTopia"
+	logo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	logo.add_theme_color_override("font_color", Color(1, 1, 1))
+	logo.add_theme_font_size_override("font_size", 46)
+	if pixel_font:
+		logo.add_theme_font_override("font", pixel_font)
+	logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	centre.add_child(logo)
 
-	_build_dots(2)
-	next_button.pressed.connect(_go_next)
+	var heading := Label.new()
+	heading.text = "Let's Get You on\nStage!"
+	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	heading.add_theme_color_override("font_color", Color(0.96, 0.42, 0.62))
+	heading.add_theme_font_size_override("font_size", 26)
+	if pixel_font:
+		heading.add_theme_font_override("font", pixel_font)
+	heading.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	centre.add_child(heading)
 
-func _build_dots(active_index: int) -> void:
-	var hbox := HBoxContainer.new()
-	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	hbox.add_theme_constant_override("separation", 10)
+	var body := Label.new()
+	body.text = "\"Step into a new world of music! Choose your\nfavorite artist, enjoy random tracks, and connect\nwith fans worldwide - all in vibrant pixel art.\""
+	body.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body.add_theme_color_override("font_color", Color(1, 1, 1))
+	body.add_theme_font_size_override("font_size", 14)
+	if pixel_font:
+		body.add_theme_font_override("font", pixel_font)
+	body.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	centre.add_child(body)
+
+	_build_bottom_bar(pixel_font, 2)
+
+func _build_bottom_bar(pixel_font: FontFile, active_dot: int) -> void:
+	var dot_row := HBoxContainer.new()
+	dot_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	dot_row.add_theme_constant_override("separation", 8)
+	dot_row.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	dot_row.offset_bottom = -28
+	dot_row.offset_top    = -52
+	dot_row.mouse_filter  = Control.MOUSE_FILTER_IGNORE
+	add_child(dot_row)
+
 	for i in 3:
-		var dot := ColorRect.new()
-		dot.custom_minimum_size = Vector2(28, 10) if i == active_index else Vector2(10, 10)
-		dot.color = DOT_ACTIVE if i == active_index else DOT_INACTIVE
-		hbox.add_child(dot)
-	$CenterContainer/VBoxContainer.add_child(hbox)
-	$CenterContainer/VBoxContainer.move_child(hbox, next_button.get_index())
+		var dot := PanelContainer.new()
+		var w : float = 28.0 if i == active_dot else 10.0
+		dot.custom_minimum_size = Vector2(w, 10)
+		dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var s := StyleBoxFlat.new()
+		s.bg_color = Color(1, 1, 1, 1.0) if i == active_dot else Color(1, 1, 1, 0.4)
+		s.set_corner_radius_all(6)
+		dot.add_theme_stylebox_override("panel", s)
+		dot_row.add_child(dot)
 
-func _go_next() -> void:
-	FirstLaunch.mark_onboarding_complete()
-	get_tree().change_scene_to_file.call_deferred(LOGIN_SCENE)
+	var prev := Label.new()
+	prev.text = "Prev"
+	prev.add_theme_color_override("font_color", Color(1, 1, 1))
+	prev.add_theme_font_size_override("font_size", 18)
+	if pixel_font:
+		prev.add_theme_font_override("font", pixel_font)
+	prev.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
+	prev.offset_left   = 28
+	prev.offset_right  = 120
+	prev.offset_bottom = -24
+	prev.offset_top    = -58
+	prev.mouse_filter  = Control.MOUSE_FILTER_STOP
+	prev.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	prev.gui_input.connect(func(e: InputEvent) -> void:
+		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
+			ScreenTransition.go(PREV_SCENE, "right")
+	)
+	add_child(prev)
 
-func _on_back_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		get_tree().change_scene_to_file.call_deferred(PREV_SCENE)
+	var next := Label.new()
+	next.text = "Next"
+	next.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	next.add_theme_color_override("font_color", Color(0.96, 0.42, 0.62))
+	next.add_theme_font_size_override("font_size", 18)
+	if pixel_font:
+		next.add_theme_font_override("font", pixel_font)
+	next.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	next.offset_right  = -28
+	next.offset_left   = -110
+	next.offset_bottom = -24
+	next.offset_top    = -58
+	next.mouse_filter  = Control.MOUSE_FILTER_STOP
+	next.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	next.gui_input.connect(func(e: InputEvent) -> void:
+		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
+			_advance()
+	)
+	add_child(next)
 
-func _on_login_label_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+func _advance() -> void:
+	if AuthManager.post_login_intro:
+		AuthManager.post_login_intro = false
+		if AuthManager.needs_character_select:
+			ScreenTransition.go(CHAR_SEL_SCENE, "left")
+		else:
+			ScreenTransition.go(WELCOME_BACK_SCENE, "left")
+	else:
 		FirstLaunch.mark_onboarding_complete()
-		get_tree().change_scene_to_file.call_deferred(LOGIN_SCENE)
+		ScreenTransition.go(LOGIN_SCENE, "left")
+
+var _swipe_start_x : float = 0.0
+var _swipe_started : bool  = false
+const SWIPE_SLOP   : float = 12.0
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventScreenDrag:
-		if event.relative.x < -60:
-			_go_next()
-		elif event.relative.x > 60:
-			get_tree().change_scene_to_file.call_deferred(PREV_SCENE)
+	if ScreenTransition._active:
+		return
+
+	if event is InputEventScreenTouch:
+		var e : InputEventScreenTouch = event
+		if e.pressed:
+			_swipe_start_x = e.position.x
+			_swipe_started = true
+		else:
+			_swipe_started = false
+
+	elif event is InputEventMouseButton:
+		var e : InputEventMouseButton = event
+		if e.button_index == MOUSE_BUTTON_LEFT:
+			if e.pressed:
+				_swipe_start_x = e.position.x
+				_swipe_started = true
+			else:
+				_swipe_started = false
+
+	elif event is InputEventScreenDrag:
+		var e : InputEventScreenDrag = event
+		if _swipe_started:
+			var dx : float = e.position.x - _swipe_start_x
+			if absf(dx) > SWIPE_SLOP:
+				_swipe_started = false
+				if dx < 0.0:
+					_advance()
+				else:
+					ScreenTransition.go(PREV_SCENE, "right")
+
+	elif event is InputEventMouseMotion:
+		var e : InputEventMouseMotion = event
+		if _swipe_started:
+			var dx : float = e.position.x - _swipe_start_x
+			if absf(dx) > SWIPE_SLOP:
+				_swipe_started = false
+				if dx < 0.0:
+					_advance()
+				else:
+					ScreenTransition.go(PREV_SCENE, "right")

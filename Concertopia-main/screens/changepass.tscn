@@ -4,7 +4,6 @@
 [ext_resource type="Script" uid="uid://dvn27winewcef" path="res://scripts/changepass.gd" id="2_ennlr"]
 [ext_resource type="FontFile" uid="uid://colg6fptsubg1" path="res://Pixelify_Sans/static/PixelifySans-Bold.ttf" id="2_f8qba"]
 [ext_resource type="FontFile" uid="uid://dmh160p0qk05g" path="res://font/Montserrat/static/Montserrat-SemiBold.ttf" id="3_speca"]
-[ext_resource type="Texture2D" uid="uid://bet7hf8f04ulo" path="res://icons/eye.png" id="4_1j06r"]
 [ext_resource type="Texture2D" uid="uid://bi5witvq4eo6v" path="res://icons/padlock.png" id="5_q21d4"]
 [ext_resource type="FontFile" uid="uid://cqmtiniotsuqq" path="res://font/Montserrat/static/Montserrat-Bold.ttf" id="6_sia14"]
 
@@ -16,6 +15,9 @@ corner_radius_top_left = 20
 corner_radius_top_right = 20
 corner_radius_bottom_right = 20
 corner_radius_bottom_left = 20
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_1j06r"]
+load_path = "res://.godot/imported/eye.png-93c8bcf8a12f63410ce2c5f2c2c53fbc.ctex"
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u2dqi"]
 bg_color = Color(0.96862745, 0.57254905, 0.7176471, 1)
@@ -76,7 +78,7 @@ theme_override_colors/font_placeholder_color = Color(0.4, 0.4, 0.4, 0.6)
 theme_override_fonts/font = ExtResource("3_speca")
 theme_override_styles/normal = SubResource("StyleBoxFlat_g2x45")
 placeholder_text = "New Password"
-right_icon = ExtResource("4_1j06r")
+right_icon = SubResource("CompressedTexture2D_1j06r")
 icon_expand_mode = 1
 
 [node name="TextureRect" type="TextureRect" parent="CenterContainer/VBoxContainer/NewPassword" unique_id=1803314476]
@@ -97,7 +99,7 @@ theme_override_colors/font_placeholder_color = Color(0.4, 0.4, 0.4, 0.6)
 theme_override_fonts/font = ExtResource("3_speca")
 theme_override_styles/normal = SubResource("StyleBoxFlat_g2x45")
 placeholder_text = "Confirm New Password"
-right_icon = ExtResource("4_1j06r")
+right_icon = SubResource("CompressedTexture2D_1j06r")
 icon_expand_mode = 1
 
 [node name="TextureRect" type="TextureRect" parent="CenterContainer/VBoxContainer/Passwowrd2" unique_id=1983773097]

@@ -6,7 +6,6 @@
 [ext_resource type="FontFile" uid="uid://dmh160p0qk05g" path="res://font/Montserrat/static/Montserrat-SemiBold.ttf" id="3_1yjxd"]
 [ext_resource type="Texture2D" uid="uid://dvh26cf4wydw7" path="res://icons/user.png" id="4_sa611"]
 [ext_resource type="Texture2D" uid="uid://bi5witvq4eo6v" path="res://icons/padlock.png" id="5_37otv"]
-[ext_resource type="Texture2D" uid="uid://bet7hf8f04ulo" path="res://icons/eye.png" id="5_svnbg"]
 [ext_resource type="FontFile" uid="uid://cqmtiniotsuqq" path="res://font/Montserrat/static/Montserrat-Bold.ttf" id="6_40nij"]
 [ext_resource type="Texture2D" uid="uid://dya60t1wx5nt0" path="res://icons/google.png" id="7_fya5r"]
 [ext_resource type="Texture2D" uid="uid://dcwl2mw6m5kjf" path="res://icons/apple-logo (1).png" id="8_k5d40"]
@@ -28,6 +27,9 @@ corner_radius_top_left = 20
 corner_radius_top_right = 20
 corner_radius_bottom_right = 20
 corner_radius_bottom_left = 20
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_1j06r"]
+load_path = "res://.godot/imported/eye.png-93c8bcf8a12f63410ce2c5f2c2c53fbc.ctex"
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u2dqi"]
 bg_color = Color(0.96862745, 0.57254905, 0.7176471, 1)
@@ -108,7 +110,7 @@ theme_override_colors/font_placeholder_color = Color(0.4, 0.4, 0.4, 0.6)
 theme_override_fonts/font = ExtResource("3_1yjxd")
 theme_override_styles/normal = SubResource("StyleBoxFlat_g2x45")
 placeholder_text = "Password"
-right_icon = ExtResource("5_svnbg")
+right_icon = SubResource("CompressedTexture2D_1j06r")
 icon_expand_mode = 1
 
 [node name="TextureRect" type="TextureRect" parent="CenterContainer/VBoxContainer/Passwowrd" unique_id=1803314476]
@@ -129,7 +131,7 @@ theme_override_colors/font_placeholder_color = Color(0.4, 0.4, 0.4, 0.6)
 theme_override_fonts/font = ExtResource("3_1yjxd")
 theme_override_styles/normal = SubResource("StyleBoxFlat_g2x45")
 placeholder_text = "Confirm Password"
-right_icon = ExtResource("5_svnbg")
+right_icon = SubResource("CompressedTexture2D_1j06r")
 icon_expand_mode = 1
 
 [node name="TextureRect" type="TextureRect" parent="CenterContainer/VBoxContainer/ConfirmPassword" unique_id=1613431454]
