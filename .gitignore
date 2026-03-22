@@ -8,6 +8,13 @@ Concertopia-main/apk-release/
 # Export presets (contains signing keys)
 export_presets.cfg
 
+# Android auto-generated build output
+Concertopia-main/android/build/build/
+Concertopia-main/android/build/libs/
+Concertopia-main/android/build/.gradle/
+Concertopia-main/android/build/generated/
+Concertopia-main/android/build/intermediates/
+
 # OS
 .DS_Store
 Thumbs.db
