@@ -1,0 +1,13 @@
+# Godot
+.godot/
+*.translation
+
+# APK release builds
+Concertopia-main/apk-release/
+
+# Export presets (contains signing keys)
+export_presets.cfg
+
+# OS
+.DS_Store
+Thumbs.db
