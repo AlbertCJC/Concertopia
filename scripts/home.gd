@@ -136,6 +136,7 @@ var _body_font  : FontFile = null
 func _ready() -> void:
 	_pixel_font = load("res://Pixelify_Sans/static/PixelifySans-Bold.ttf") as FontFile
 	_body_font  = load("res://font/Montserrat/static/Montserrat-SemiBold.ttf") as FontFile
+	
 	# Hide the legacy TopBar node that exists in the .tscn but is unused —
 	# home.gd builds its own top bar programmatically below.
 	var legacy_topbar : Node = get_node_or_null("TopBar")
@@ -150,9 +151,177 @@ func _ready() -> void:
 	_size_slots()
 	_snap_row()
 	_build_top_bar()
+	_build_sidebar()
 	_build_dot_indicators()
 	_animate_enter_in()
 	_setup_music()
+
+# ── Sidebar UI ───────────────────────────────────────────────────────────────
+func _build_sidebar() -> void:
+	# Use a CanvasLayer to ensure the sidebar is always on top and receives input
+	var layer := CanvasLayer.new()
+	layer.name = "SidebarLayer"
+	add_child(layer)
+	
+	var sidebar_container := Control.new()
+	sidebar_container.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	sidebar_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(sidebar_container)
+	
+	var sidebar := VBoxContainer.new()
+	sidebar.add_theme_constant_override("separation", 18)
+	sidebar.anchor_left = 1.0
+	sidebar.anchor_right = 1.0
+	sidebar.anchor_top = 0.5
+	sidebar.anchor_bottom = 0.5
+	sidebar.offset_left = -230 # Increased width slightly
+	sidebar.offset_right = -20
+	sidebar.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	sidebar.grow_vertical = Control.GROW_DIRECTION_BOTH
+	sidebar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	sidebar_container.add_child(sidebar)
+	
+	# Semi-transparent background panel for the sidebar
+	var panel := PanelContainer.new()
+	var p_style := StyleBoxFlat.new()
+	p_style.bg_color = Color(0.1, 0.08, 0.2, 0.6) # More opaque
+	p_style.set_corner_radius_all(0)
+	p_style.border_width_left = 4; p_style.border_color = Color(C_PINK.r, C_PINK.g, C_PINK.b, 0.4)
+	p_style.content_margin_left = 15; p_style.content_margin_right = 15
+	p_style.content_margin_top = 20; p_style.content_margin_bottom = 20
+	panel.add_theme_stylebox_override("panel", p_style)
+	sidebar.add_child(panel)
+	
+	var btn_vbox := VBoxContainer.new()
+	btn_vbox.add_theme_constant_override("separation", 15)
+	panel.add_child(btn_vbox)
+	
+	# Action buttons for the sidebar
+	_add_sidebar_btn(btn_vbox, "✦ MINT NFT", func(): get_tree().change_scene_to_file("res://screens/nft_generation.tscn"), Color(0.98, 0.8, 0.1))
+	_add_sidebar_btn(btn_vbox, "✦ VAULT", func(): get_tree().change_scene_to_file("res://screens/vault.tscn"), Color(0.96, 0.42, 0.62))
+	
+	var reward_btn = _add_sidebar_btn(btn_vbox, "✦ DAILY REWARD", _on_daily_login_pressed, Color(0.4, 0.9, 0.6))
+	
+	# Notification dot for daily reward
+	if AuthManager.is_daily_reward_available():
+		var dot := ColorRect.new()
+		dot.custom_minimum_size = Vector2(14, 14)
+		dot.color = Color.RED
+		dot.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+		dot.offset_left = -16; dot.offset_top = 2
+		reward_btn.add_child(dot)
+		
+		# Pulse the dot
+		var tw = create_tween().set_loops()
+		tw.tween_property(dot, "modulate:a", 0.2, 0.6)
+		tw.tween_property(dot, "modulate:a", 1.0, 0.6)
+
+func _add_sidebar_btn(parent: Control, txt: String, callback: Callable, color: Color) -> Button:
+	var btn := Button.new()
+	btn.text = txt
+	btn.custom_minimum_size = Vector2(180, 50)
+	btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	
+	var style := StyleBoxFlat.new()
+	style.bg_color = color.darkened(0.2)
+	style.border_width_left = 4; style.border_width_right = 4
+	style.border_width_top = 4; style.border_width_bottom = 4
+	style.border_color = color
+	style.set_corner_radius_all(0)
+	style.shadow_color = Color(0, 0, 0, 0.7)
+	style.shadow_size = 0; style.shadow_offset = Vector2(8, 8)
+	
+	var hov = style.duplicate(); hov.bg_color = color
+	var pre = style.duplicate(); pre.shadow_offset = Vector2(0, 0)
+	
+	btn.add_theme_stylebox_override("normal", style)
+	btn.add_theme_stylebox_override("hover", hov)
+	btn.add_theme_stylebox_override("pressed", pre)
+	btn.add_theme_color_override("font_color", Color.WHITE)
+	if _pixel_font: btn.add_theme_font_override("font", _pixel_font)
+	
+	btn.pressed.connect(func():
+		print("[Home] Sidebar Button Pressed: ", txt)
+		AudioManager.play("click")
+		callback.call()
+	)
+	btn.mouse_entered.connect(func(): AudioManager.play("hover"))
+	
+	parent.add_child(btn)
+	return btn
+
+# ── Daily Login Reward UI ───────────────────────────────────────────────────
+func _on_daily_login_pressed() -> void:
+	var overlay := ColorRect.new()
+	overlay.color = Color(0, 0, 0, 0.75)
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(overlay)
+	
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+	
+	var card := PanelContainer.new()
+	card.custom_minimum_size = Vector2(400, 300)
+	var card_style := StyleBoxFlat.new()
+	card_style.bg_color = Color(0.12, 0.08, 0.24)
+	card_style.border_width_left = 6; card_style.border_width_right = 6
+	card_style.border_width_top = 6; card_style.border_width_bottom = 6
+	card_style.border_color = Color(0.98, 0.8, 0.1) # Gold
+	card_style.set_corner_radius_all(0)
+	card_style.shadow_color = Color(0, 0, 0, 1)
+	card_style.shadow_size = 0; card_style.shadow_offset = Vector2(16, 16)
+	card.add_theme_stylebox_override("panel", card_style)
+	center.add_child(card)
+	
+	var vbox := VBoxContainer.new()
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_theme_constant_override("separation", 25)
+	card.add_child(vbox)
+	
+	var title := Label.new()
+	title.text = "DAILY TRANSMISSION"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 28)
+	title.add_theme_color_override("font_color", Color(0.98, 0.8, 0.1))
+	if _pixel_font: title.add_theme_font_override("font", _pixel_font)
+	vbox.add_child(title)
+	
+	var msg := Label.new()
+	msg.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	msg.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	if _body_font: msg.add_theme_font_override("font", _body_font)
+	vbox.add_child(msg)
+	
+	var claim_btn := Button.new()
+	claim_btn.custom_minimum_size = Vector2(200, 60)
+	if _pixel_font: claim_btn.add_theme_font_override("font", _pixel_font)
+	vbox.add_child(claim_btn)
+	
+	var btn_style = StyleBoxFlat.new()
+	btn_style.set_corner_radius_all(0)
+	
+	var available = AuthManager.is_daily_reward_available()
+	if available:
+		msg.text = "Signal located! Claim your daily attendance reward of 1 credit."
+		claim_btn.text = "CLAIM REWARD"
+		btn_style.bg_color = Color(0.98, 0.8, 0.1)
+		claim_btn.add_theme_stylebox_override("normal", btn_style)
+		claim_btn.add_theme_color_override("font_color", Color.BLACK)
+	else:
+		msg.text = "Transmission complete for today. Return tomorrow for more credits."
+		claim_btn.text = "CLOSE"
+		btn_style.bg_color = Color(0.4, 0.4, 0.5)
+		claim_btn.add_theme_stylebox_override("normal", btn_style)
+	
+	claim_btn.pressed.connect(func():
+		if available:
+			AuthManager.claim_daily_reward()
+			UIUtils.show_toast("CREDIT CLAIMED!", Color.GOLD)
+			AudioManager.play("reward")
+		overlay.queue_free()
+		get_tree().reload_current_scene()
+	)
 
 func _setup_music() -> void:
 	_bg_music = AudioStreamPlayer.new()
@@ -340,9 +509,31 @@ func _build_top_bar() -> void:
 	var profile_btn := Button.new()
 	profile_btn.flat = true
 	profile_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	profile_btn.mouse_filter = Control.MOUSE_FILTER_STOP
+	profile_btn.custom_minimum_size = Vector2(180, 56)
+	
+	# Add a transparent background to make the entire rect clickable
+	var p_style = StyleBoxFlat.new()
+	p_style.bg_color = Color(1, 1, 1, 0)
+	profile_btn.add_theme_stylebox_override("normal", p_style)
+	profile_btn.add_theme_stylebox_override("hover", p_style)
+	profile_btn.add_theme_stylebox_override("pressed", p_style)
+	profile_btn.add_theme_stylebox_override("focus", p_style)
+	
+	# Hover effect for profile
+	profile_btn.mouse_entered.connect(func():
+		var tw = create_tween()
+		tw.tween_property(profile_btn, "modulate", Color(1.2, 1.2, 1.2), 0.1)
+	)
+	profile_btn.mouse_exited.connect(func():
+		var tw = create_tween()
+		tw.tween_property(profile_btn, "modulate", Color(1.0, 1.0, 1.0), 0.1)
+	)
+	
 	var profile_hbox := HBoxContainer.new()
 	profile_hbox.add_theme_constant_override("separation", 8)
 	profile_hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	profile_hbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	profile_btn.add_child(profile_hbox)
 
 	var av_panel := PanelContainer.new()
@@ -392,7 +583,7 @@ func _build_top_bar() -> void:
 	tagline.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	name_vbox.add_child(tagline)
 
-	profile_btn.pressed.connect(_on_settings_pressed)
+	profile_btn.pressed.connect(_on_profile_pressed)
 	hbox.add_child(profile_btn)
 
 	# ── Center: title ─────────────────────────────────────────────────────────
@@ -437,9 +628,46 @@ func _build_top_bar() -> void:
 	right_hbox.add_theme_constant_override("separation", 6)
 	right_hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hbox.add_child(right_hbox)
+	
+	_add_topbar_credits_indicator(right_hbox)
 
 	_add_topbar_icon_btn(right_hbox, "≡ SETTINGS", _on_settings_pressed)
 	_add_topbar_icon_btn(right_hbox, "→ LOGOUT", _on_logout)
+
+func _add_topbar_credits_indicator(parent: Control) -> void:
+	var credits = AuthManager.current_user.get("avatar_credits", 0)
+	
+	var badge := PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.15, 0.12, 0.20, 0.8)
+	style.set_corner_radius_all(15)
+	style.border_width_left   = 1
+	style.border_width_right  = 1
+	style.border_width_top    = 1
+	style.border_width_bottom = 1
+	style.border_color = Color(0.92, 0.75, 0.48, 0.5) # Gold-ish
+	badge.add_theme_stylebox_override("panel", style)
+	badge.custom_minimum_size = Vector2(80, 36)
+	
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 12)
+	margin.add_theme_constant_override("margin_right", 12)
+	badge.add_child(margin)
+	
+	var hbox := HBoxContainer.new()
+	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	hbox.add_theme_constant_override("separation", 6)
+	margin.add_child(hbox)
+	
+	var lbl := Label.new()
+	lbl.text = "Credits: %d" % credits
+	lbl.add_theme_color_override("font_color", Color(0.92, 0.75, 0.48)) # Gold
+	lbl.add_theme_font_size_override("font_size", 12)
+	if _body_font:
+		lbl.add_theme_font_override("font", _body_font)
+	hbox.add_child(lbl)
+	
+	parent.add_child(badge)
 
 func _add_topbar_btn(parent: Control, text: String, col: Color, callback: Callable) -> void:
 	var btn := Button.new()
@@ -599,8 +827,34 @@ func _style_card_panel(idx: int, data: Dictionary) -> void:
 	style.border_color = accent
 	style.shadow_color = Color(0, 0, 0, 1.0)
 	style.shadow_size  = 0
-	style.shadow_offset = Vector2(8, 8) # Retro blocky shadow
+	style.shadow_offset = Vector2(8, 8)
 	card.add_theme_stylebox_override("panel", style)
+
+	# Interactive Hover effects
+	card.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	card.mouse_entered.connect(func():
+		AudioManager.play("hover")
+		var tw = create_tween().set_parallel(true)
+		tw.tween_property(card, "scale", Vector2(1.05, 1.05), 0.15).set_trans(Tween.TRANS_SINE)
+		tw.tween_property(card, "rotation_degrees", 1.0, 0.15)
+		var s = card.get_theme_stylebox("panel") as StyleBoxFlat
+		tw.tween_property(s, "shadow_offset", Vector2(12, 12), 0.15)
+	)
+	card.mouse_exited.connect(func():
+		var tw = create_tween().set_parallel(true)
+		tw.tween_property(card, "scale", Vector2(1.0, 1.0), 0.15).set_trans(Tween.TRANS_SINE)
+		tw.tween_property(card, "rotation_degrees", 0.0, 0.15)
+		var s = card.get_theme_stylebox("panel") as StyleBoxFlat
+		tw.tween_property(s, "shadow_offset", Vector2(8, 8), 0.15)
+	)
+	card.gui_input.connect(func(event: InputEvent):
+		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			AudioManager.play("click")
+			if idx == _current_idx:
+				_on_enter_pressed()
+			else:
+				_navigate(idx - _current_idx)
+	)
 
 func _style_door(door: Control, col: Color, accent: Color) -> void:
 	if door == null:
@@ -791,6 +1045,9 @@ func _flat_style(col: Color, radius: int) -> StyleBoxFlat:
 	return s
 
 # ── Top bar actions ────────────────────────────────────────────────────────────
+func _on_profile_pressed() -> void:
+	get_tree().change_scene_to_file.call_deferred("res://screens/user_profile.tscn")
+
 func _on_settings_pressed() -> void:
 	get_tree().change_scene_to_file.call_deferred(SETTINGS_SCENE)
 

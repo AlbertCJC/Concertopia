@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://chqobnwx7570s"]
+
+[ext_resource type="Script" uid="uid://cneqy47kivnck" path="res://scripts/nft_generation.gd" id="1_svqml"]
+
+[node name="nft_generation" type="Control" unique_id=491788507]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_svqml")

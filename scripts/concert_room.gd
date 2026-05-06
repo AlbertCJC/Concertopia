@@ -213,6 +213,42 @@ const JOURNEYS : Dictionary = {
 	],
 }
 
+# ── Concert tour data ──────────────────────────────────────────────────────────
+const CONCERT_TOURS : Dictionary = {
+	"BRUNO\nMARS": [
+		{ "year": "2010–2012", "title": "The Doo-Wops & Hooligans Tour", "text": "Bruno Mars' debut headlining tour to support his breakthrough album. It established his reputation as a phenomenal live performer, playing intimate venues before scaling up to arenas." },
+		{ "year": "2013–2014", "title": "The Moonshine Jungle Tour", "text": "A massive global tour supporting Unorthodox Jukebox. Featuring tight choreography and a spectacular backing band, The Hooligans, it cemented his status as a stadium-level entertainer." },
+		{ "year": "2017–2018", "title": "24K Magic World Tour", "text": "An incredibly successful tour celebrating 1990s R&B and funk. It grossed over $367 million globally and won a Billboard Music Award for Top R&B Tour." },
+		{ "year": "2021–Now", "title": "Silk Sonic & Las Vegas Residency", "text": "Performances focusing on his collaborative project with Anderson .Paak, and an ongoing, highly praised residency at Park MGM in Las Vegas, blending his greatest hits with unmatched showmanship." }
+	],
+	"TAYLOR\nSWIFT": [
+		{ "year": "2009–2010", "title": "Fearless Tour", "text": "Taylor's debut headlining concert tour, solidifying her as a teenage country-pop sensation with theatrical set pieces and multiple costume changes." },
+		{ "year": "2011–2012", "title": "Speak Now World Tour", "text": "A highly theatrical tour where Swift acted as the sole writer of the album, featuring Broadway-style staging, fireworks, and aerial balconies." },
+		{ "year": "2013–2014", "title": "The Red Tour", "text": "Her transitional tour bridging country and pure pop. It became the highest-grossing tour by a country artist at the time, featuring elaborate choreography and a stadium-ready production." },
+		{ "year": "2015", "title": "The 1989 World Tour", "text": "A massive pop spectacle filled with surprise guest appearances from legendary artists and supermodels, solidifying her complete crossover into pop dominance." },
+		{ "year": "2018", "title": "Reputation Stadium Tour", "text": "A darker, more intense stadium-only tour featuring giant inflatable snakes and a massive production scale. It became the highest-grossing US tour in history at the time." },
+		{ "year": "2023–2024", "title": "The Eras Tour", "text": "A monumental, career-spanning retrospective. It became a cultural phenomenon, breaking records as the first concert tour in history to gross over one billion dollars." }
+	],
+	"ARIANA\nGRANDE": [
+		{ "year": "2013", "title": "The Listening Sessions", "text": "Ariana's debut tour supporting Yours Truly. Intimate theater shows that showcased her immense vocal talent and four-octave range to early fans." },
+		{ "year": "2015", "title": "The Honeymoon Tour", "text": "Her first global arena tour supporting My Everything. It featured a mix of emotional ballads and high-energy pop anthems, proving her vocal endurance." },
+		{ "year": "2017", "title": "Dangerous Woman Tour", "text": "A more mature and globally expansive tour. Tragically interrupted by the Manchester Arena bombing, it became a symbol of resilience when she returned for the One Love Manchester benefit." },
+		{ "year": "2019", "title": "Sweetener World Tour", "text": "Supporting both Sweetener and Thank U, Next. It featured striking, minimalist moon-themed production and became her highest-grossing tour, capturing her at the peak of her commercial power." }
+	],
+	"CHAPPELL\nROAN": [
+		{ "year": "2023", "title": "The Naked in North America Tour", "text": "Her first headlining tour, playing small clubs. It helped build her fiercely loyal core audience, establishing the dress-up themes and drag-inspired aesthetic." },
+		{ "year": "2024", "title": "The Midwest Princess Tour", "text": "A massive breakout tour following her sudden mainstream explosion. Shows quickly moved from mid-sized venues to sold-out arenas as her popularity skyrocketed." },
+		{ "year": "2024–Now", "title": "Festival Domination", "text": "Historic, record-breaking crowds at major festivals like Coachella and Lollapalooza, where her performances drew some of the largest daytime audiences in festival history." }
+	],
+	"THE\nWEEKND": [
+		{ "year": "2012", "title": "The Fall Tour", "text": "His first tour supporting the Trilogy mixtapes. The shows were mysterious and hazy, matching his early enigmatic and shadowy public persona." },
+		{ "year": "2014", "title": "King of the Fall Tour", "text": "A short but significant tour transitioning him from an underground R&B mystery to a mainstream force, building hype for his major label debut." },
+		{ "year": "2015", "title": "The Madness Fall Tour", "text": "Supporting Beauty Behind the Madness. This arena tour launched him into global pop stardom, featuring elaborate lighting and a more confident stage presence." },
+		{ "year": "2017", "title": "Starboy: Legend of the Fall Tour", "text": "A colossal world tour featuring a massive spaceship-like lighting rig. It highlighted his shift towards electronic and synth-pop aesthetics." },
+		{ "year": "2022–2024", "title": "After Hours til Dawn Stadium Tour", "text": "A visually stunning, post-apocalyptic stadium tour. Featuring a burning cityscape and a giant moon, it broke attendance records across Europe and Latin America." }
+	]
+}
+
 # ── Room data ──────────────────────────────────────────────────────────────────
 var _room : Dictionary = {}
 
@@ -254,8 +290,45 @@ func _build_ui() -> void:
 
 	_build_top_bar()
 	_build_journey_scroll()
+	_build_ai_ui()
 
 # ── TOP BAR ────────────────────────────────────────────────────────────────────
+func _add_topbar_credits_indicator(parent: Control) -> void:
+	var credits = AuthManager.current_user.get("avatar_credits", 0)
+	var acc : Color = _room.get("accent", C_PINK)
+	
+	var badge := PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.15, 0.12, 0.20, 0.8)
+	style.set_corner_radius_all(15)
+	style.border_width_left   = 1
+	style.border_width_right  = 1
+	style.border_width_top    = 1
+	style.border_width_bottom = 1
+	style.border_color = Color(0.92, 0.75, 0.48, 0.5) # Gold-ish
+	badge.add_theme_stylebox_override("panel", style)
+	badge.custom_minimum_size = Vector2(80, 36)
+	
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 12)
+	margin.add_theme_constant_override("margin_right", 12)
+	badge.add_child(margin)
+	
+	var hbox := HBoxContainer.new()
+	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	hbox.add_theme_constant_override("separation", 6)
+	margin.add_child(hbox)
+	
+	var lbl := Label.new()
+	lbl.text = "Credits: %d" % credits
+	lbl.add_theme_color_override("font_color", Color(0.92, 0.75, 0.48)) # Gold
+	lbl.add_theme_font_size_override("font_size", 12)
+	if _body_font:
+		lbl.add_theme_font_override("font", _body_font)
+	hbox.add_child(lbl)
+	
+	parent.add_child(badge)
+
 func _build_top_bar() -> void:
 	var acc : Color = _room.get("accent", C_PINK)
 
@@ -338,6 +411,9 @@ func _build_top_bar() -> void:
 	sp2.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	sp2.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hbox.add_child(sp2)
+	
+	# Credits Indicator
+	_add_topbar_credits_indicator(hbox)
 
 	# Genre badge (right side, same width as back button for balance)
 	var genre_lbl := Label.new()
@@ -355,7 +431,7 @@ func _build_top_bar() -> void:
 # ── JOURNEY SCROLL ─────────────────────────────────────────────────────────────
 func _build_journey_scroll() -> void:
 	var artist_key : String = _room.get("artist", "")
-	var entries : Array = JOURNEYS.get(artist_key, [])
+	var entries : Array = CONCERT_TOURS.get(artist_key, [])
 	var acc : Color = _room.get("accent", C_PINK)
 
 	# Outer scroll container — fills below the top bar
@@ -409,18 +485,18 @@ func _add_intro_header(parent: VBoxContainer, artist_key: String, acc: Color) ->
 	parent.add_child(spacer_top)
 
 	var heading := Label.new()
-	heading.text = "THE STORY OF " + name_str.to_upper()
+	heading.text = "CONCERT HISTORY OF " + name_str.to_upper()
 	heading.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	heading.add_theme_color_override("font_color", C_CREAM)
-	heading.add_theme_font_size_override("font_size", 26)
+	heading.add_theme_font_size_override("font_size", 24)
 	if _pixel_font:
 		heading.add_theme_font_override("font", _pixel_font)
 	heading.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	parent.add_child(heading)
 
 	var subhead := Label.new()
-	subhead.text = "from the very beginning to now"
+	subhead.text = "the defining tours and live performances"
 	subhead.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	subhead.add_theme_color_override("font_color", Color(acc.r, acc.g, acc.b, 0.70))
 	subhead.add_theme_font_size_override("font_size", 12)
@@ -478,9 +554,9 @@ func _add_timeline_entry(
 	dot_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	var dot_style := StyleBoxFlat.new()
 	dot_style.bg_color = acc
-	dot_style.set_corner_radius_all(14)
-	dot_style.content_margin_left   = 6
-	dot_style.content_margin_right  = 6
+	dot_style.set_corner_radius_all(0) # Consistency: Blocky
+	dot_style.content_margin_left   = 8
+	dot_style.content_margin_right  = 8
 	dot_style.content_margin_top    = 4
 	dot_style.content_margin_bottom = 4
 	dot_panel.add_theme_stylebox_override("panel", dot_style)
@@ -510,25 +586,31 @@ func _add_timeline_entry(
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	card.size_flags_vertical   = Control.SIZE_SHRINK_BEGIN
 	var card_style := StyleBoxFlat.new()
-	card_style.bg_color = Color(
-		lerpf(C_PANEL.r, acc.r, 0.05),
-		lerpf(C_PANEL.g, acc.g, 0.05),
-		lerpf(C_PANEL.b, acc.b, 0.05)
-	)
-	card_style.set_corner_radius_all(12)
-	card_style.border_width_left   = 2
-	card_style.border_width_right  = 0
-	card_style.border_width_top    = 0
-	card_style.border_width_bottom = 0
-	card_style.border_color        = Color(acc.r, acc.g, acc.b, 0.55)
-	card_style.shadow_color        = Color(0, 0, 0, 0.35)
-	card_style.shadow_size         = 6
+	card_style.bg_color = Color(lerpf(C_PANEL.r, acc.r, 0.02), lerpf(C_PANEL.g, acc.g, 0.02), lerpf(C_PANEL.b, acc.b, 0.02))
+	card_style.set_corner_radius_all(0) # Consistency: Blocky
+	card_style.border_width_left   = 4
+	card_style.border_color        = acc
+	card_style.shadow_color        = Color(0, 0, 0, 0.8)
+	card_style.shadow_size         = 0
+	card_style.shadow_offset       = Vector2(6, 6)
 	card_style.content_margin_left   = 16
 	card_style.content_margin_right  = 16
 	card_style.content_margin_top    = 14
 	card_style.content_margin_bottom = 14
 	card.add_theme_stylebox_override("panel", card_style)
 	row.add_child(card)
+	
+	# Hover effect for timeline cards
+	card.mouse_entered.connect(func():
+		var tw = create_tween().set_parallel(true)
+		tw.tween_property(card, "scale", Vector2(1.02, 1.02), 0.1)
+		tw.tween_property(card_style, "shadow_offset", Vector2(10, 10), 0.1)
+	)
+	card.mouse_exited.connect(func():
+		var tw = create_tween().set_parallel(true)
+		tw.tween_property(card, "scale", Vector2(1.0, 1.0), 0.1)
+		tw.tween_property(card_style, "shadow_offset", Vector2(6, 6), 0.1)
+	)
 
 	var card_vbox := VBoxContainer.new()
 	card_vbox.add_theme_constant_override("separation", 8)
@@ -607,3 +689,178 @@ func _flat(col: Color, radius: int) -> StyleBoxFlat:
 
 func _on_leave_pressed() -> void:
 	get_tree().change_scene_to_file.call_deferred(HOME_SCENE)
+
+# ── AI CONCERT HISTORY ────────────────────────────────────────────────────────
+var _ai_panel : PanelContainer = null
+var _ai_label : RichTextLabel = null
+var _ai_loading : Label = null
+var _ai_open : bool = false
+var _ai_full_text : String = ""
+var _ai_char_idx : int = 0
+
+var _ai_toggle_btn : Button = null
+
+func _build_ai_ui() -> void:
+	# 1. The slide-out panel
+	_ai_panel = PanelContainer.new()
+	var acc : Color = _room.get("accent", C_PINK)
+	_ai_panel.anchor_left = 1.0
+	_ai_panel.anchor_top = 0.0
+	_ai_panel.anchor_right = 1.0
+	_ai_panel.anchor_bottom = 1.0
+	_ai_panel.offset_left = 0
+	_ai_panel.offset_right = 400
+	_ai_panel.offset_top = 56
+	_ai_panel.visible = false
+	
+	var style := StyleBoxFlat.new()
+	style.bg_color = C_PANEL_DARK
+	style.border_width_left = 2
+	style.border_color = acc
+	_ai_panel.add_theme_stylebox_override("panel", style)
+	add_child(_ai_panel)
+	
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 20)
+	margin.add_theme_constant_override("margin_right", 20)
+	margin.add_theme_constant_override("margin_top", 20)
+	margin.add_theme_constant_override("margin_bottom", 20)
+	_ai_panel.add_child(margin)
+	
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 12)
+	margin.add_child(vbox)
+	
+	var title := Label.new()
+	title.text = "Artist Biography"
+	title.add_theme_color_override("font_color", C_GOLD_LIGHT)
+	title.add_theme_font_size_override("font_size", 16)
+	if _pixel_font: title.add_theme_font_override("font", _pixel_font)
+	vbox.add_child(title)
+	
+	var sep := ColorRect.new()
+	sep.custom_minimum_size = Vector2(0, 1)
+	sep.color = Color(acc.r, acc.g, acc.b, 0.3)
+	vbox.add_child(sep)
+	
+	_ai_loading = Label.new()
+	_ai_loading.text = "Generating..."
+	_ai_loading.visible = false
+	_ai_loading.add_theme_color_override("font_color", C_CREAM)
+	if _body_font: _ai_loading.add_theme_font_override("font", _body_font)
+	vbox.add_child(_ai_loading)
+	
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	vbox.add_child(scroll)
+	
+	var scroll_margin := MarginContainer.new()
+	scroll_margin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll_margin.add_theme_constant_override("margin_right", 12)
+	scroll.add_child(scroll_margin)
+	
+	_ai_label = RichTextLabel.new()
+	_ai_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_ai_label.fit_content = true
+	_ai_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_ai_label.bbcode_enabled = true
+	_ai_label.add_theme_color_override("default_color", C_CREAM)
+	if _body_font: _ai_label.add_theme_font_override("normal_font", _body_font)
+	_ai_label.add_theme_font_size_override("normal_font_size", 12)
+	_ai_label.meta_clicked.connect(_on_ai_link_clicked)
+	scroll_margin.add_child(_ai_label)
+	
+	# 2. The toggle button for AI History
+	_ai_toggle_btn = Button.new()
+	_ai_toggle_btn.text = "✦ ARTIST HISTORY"
+	_ai_toggle_btn.anchor_left = 1.0
+	_ai_toggle_btn.anchor_top = 0.5
+	_ai_toggle_btn.anchor_right = 1.0
+	_ai_toggle_btn.anchor_bottom = 0.5
+	_ai_toggle_btn.offset_left = -140
+	_ai_toggle_btn.offset_top = -20
+	_ai_toggle_btn.offset_right = 0
+	_ai_toggle_btn.offset_bottom = 20
+	_ai_toggle_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	
+	var sn := _flat(C_PANEL, 8)
+	sn.border_width_left = 2
+	sn.border_width_top = 2
+	sn.border_width_bottom = 2
+	sn.border_color = acc
+	
+	var sh := _flat(acc, 8)
+	
+	_ai_toggle_btn.add_theme_stylebox_override("normal", sn)
+	_ai_toggle_btn.add_theme_stylebox_override("hover", sh)
+	_ai_toggle_btn.add_theme_stylebox_override("pressed", sn)
+	_ai_toggle_btn.add_theme_color_override("font_color", C_CREAM)
+	if _pixel_font: _ai_toggle_btn.add_theme_font_override("font", _pixel_font)
+	
+	_ai_toggle_btn.pressed.connect(_on_ai_button_pressed)
+	add_child(_ai_toggle_btn)
+
+func _on_ai_button_pressed() -> void:
+	if _ai_panel.visible and _ai_open:
+		_ai_open = false
+		var tw := create_tween().set_parallel(true)
+		tw.tween_property(_ai_panel, "offset_left", 0, 0.3).set_trans(Tween.TRANS_SINE)
+		tw.tween_property(_ai_panel, "offset_right", 400, 0.3).set_trans(Tween.TRANS_SINE)
+		tw.tween_property(_ai_toggle_btn, "offset_left", -140, 0.3).set_trans(Tween.TRANS_SINE)
+		tw.tween_property(_ai_toggle_btn, "offset_right", 0, 0.3).set_trans(Tween.TRANS_SINE)
+		tw.chain().tween_callback(func(): _ai_panel.visible = false)
+	else:
+		_ai_panel.visible = true
+		_ai_open = true
+		var tw := create_tween().set_parallel(true)
+		tw.tween_property(_ai_panel, "offset_left", -400, 0.3).set_trans(Tween.TRANS_SINE)
+		tw.tween_property(_ai_panel, "offset_right", 0, 0.3).set_trans(Tween.TRANS_SINE)
+		tw.tween_property(_ai_toggle_btn, "offset_left", -540, 0.3).set_trans(Tween.TRANS_SINE)
+		tw.tween_property(_ai_toggle_btn, "offset_right", -400, 0.3).set_trans(Tween.TRANS_SINE)
+		_generate_ai_history()
+
+func _generate_ai_history() -> void:
+	if _ai_loading.visible or (_ai_char_idx > 0 and _ai_char_idx < _ai_full_text.length()):
+		return
+		
+	var artist : String = _room.get("artist", "ARTIST").replace("\n", " ")
+	var artist_key : String = _room.get("artist", "")
+	
+	_ai_loading.visible = true
+	_ai_label.text = ""
+	_ai_full_text = ""
+	_ai_char_idx = 0
+	
+	await get_tree().create_timer(1.0).timeout
+	
+	_ai_loading.visible = false
+	
+	var history_entries : Array = JOURNEYS.get(artist_key, [])
+	var history_text = ""
+	
+	if history_entries.is_empty():
+		history_text = "✦ Information about this artist's biography is currently being updated.\n\n"
+	else:
+		for i in range(min(5, history_entries.size())): # show up to 5 defining eras
+			var entry = history_entries[i]
+			history_text += "[b]%s - %s:[/b]\n%s\n\n" % [entry.get("year", ""), entry.get("title", ""), entry.get("text", "")]
+		
+	var mock_response := "[b]The Journey of %s:[/b]\n\n" % artist
+	mock_response += history_text
+	
+	mock_response += "[b]Upcoming / Ongoing Concerts:[/b]\n"
+	mock_response += "[url=https://www.ticketmaster.com/search?q=%s]✦ Find %s Tickets on Ticketmaster[/url]\n" % [artist.replace(" ", "%20"), artist]
+	mock_response += "[url=https://www.bandsintown.com/a/%s]✦ View %s Tour Dates on Bandsintown[/url]" % [artist.replace(" ", "%20"), artist]
+	
+	_ai_full_text = mock_response
+	
+	var tw = create_tween()
+	tw.tween_method(_type_ai_text, 0, _ai_full_text.length(), _ai_full_text.length() * 0.010)
+
+func _type_ai_text(chars: int) -> void:
+	_ai_char_idx = chars
+	_ai_label.text = _ai_full_text.substr(0, _ai_char_idx)
+	
+func _on_ai_link_clicked(meta: Variant) -> void:
+	OS.shell_open(str(meta))

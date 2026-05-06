@@ -155,6 +155,7 @@ func _ensure_error_label() -> void:
 	error_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	error_label.add_theme_color_override("font_color", Color(1, 0.3, 0.3))
 	error_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	error_label.custom_minimum_size = Vector2(300, 0)
 	error_label.visible = false
 	add_child(error_label)
 	move_child(error_label, signup_button.get_index())

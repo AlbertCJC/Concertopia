@@ -4,6 +4,9 @@ const NEXT_SCENE : String = "res://screens/welcome_screen3.tscn"
 const PREV_SCENE : String = "res://screens/welcome_screen1.tscn"
 
 func _ready() -> void:
+	# Clean slate
+	for child in get_children():
+		child.queue_free()
 	_build_ui()
 
 func _build_ui() -> void:
@@ -12,10 +15,19 @@ func _build_ui() -> void:
 	) as FontFile
 
 	var bg := ColorRect.new()
-	bg.color        = Color(0, 0, 0)
+	bg.color        = Color(0.04, 0.03, 0.10)
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
+	
+	var grid := TextureRect.new()
+	grid.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	grid.stretch_mode = TextureRect.STRETCH_TILE
+	grid.modulate.a = 0.05
+	var img := Image.create(2, 2, false, Image.FORMAT_RGBA8)
+	img.set_pixel(0, 0, Color.WHITE); img.set_pixel(1, 1, Color.WHITE)
+	grid.texture = ImageTexture.create_from_image(img)
+	add_child(grid)
 
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -28,7 +40,7 @@ func _build_ui() -> void:
 
 	var centre := VBoxContainer.new()
 	centre.alignment    = BoxContainer.ALIGNMENT_CENTER
-	centre.add_theme_constant_override("separation", 8)
+	centre.add_theme_constant_override("separation", 10)
 	centre.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	margin.add_child(centre)
 
@@ -42,11 +54,6 @@ func _build_ui() -> void:
 	logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	centre.add_child(logo)
 
-	var sp1 := Control.new()
-	sp1.custom_minimum_size = Vector2(0, 4)
-	sp1.mouse_filter        = Control.MOUSE_FILTER_IGNORE
-	centre.add_child(sp1)
-
 	var heading := Label.new()
 	heading.text = "Your Concert,\nYour Way"
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -58,7 +65,7 @@ func _build_ui() -> void:
 	centre.add_child(heading)
 
 	var sub := Label.new()
-	sub.text = "Here's what's waiting for you :"
+	sub.text = "Here's what's waiting for you:"
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sub.add_theme_color_override("font_color", Color(0.96, 0.42, 0.62))
 	sub.add_theme_font_size_override("font_size", 13)
@@ -67,32 +74,25 @@ func _build_ui() -> void:
 	sub.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	centre.add_child(sub)
 
-	var sp2 := Control.new()
-	sp2.custom_minimum_size = Vector2(0, 6)
-	sp2.mouse_filter        = Control.MOUSE_FILTER_IGNORE
-	centre.add_child(sp2)
-
 	var feature_margin := MarginContainer.new()
-	feature_margin.add_theme_constant_override("margin_left",   80)
-	feature_margin.add_theme_constant_override("margin_right",  80)
-	feature_margin.add_theme_constant_override("margin_top",     0)
-	feature_margin.add_theme_constant_override("margin_bottom",  0)
+	feature_margin.add_theme_constant_override("margin_left",   60)
+	feature_margin.add_theme_constant_override("margin_right",  60)
 	feature_margin.mouse_filter          = Control.MOUSE_FILTER_IGNORE
 	feature_margin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	centre.add_child(feature_margin)
 
 	var feature_vbox := VBoxContainer.new()
-	feature_vbox.add_theme_constant_override("separation", 6)
+	feature_vbox.add_theme_constant_override("separation", 8)
 	feature_vbox.mouse_filter          = Control.MOUSE_FILTER_IGNORE
 	feature_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	feature_margin.add_child(feature_vbox)
 
 	var features : Array[String] = [
-		"🎸  Artist Selection - Pick from a lineup of pixel-art musicians.",
-		"🎵  Random Song Playback - Enjoy a surprise track every time.",
+		"🎸  Artist Selection - Pick from a lineup of musicians.",
+		"🎵  Surprise Tracks - Enjoy random tracks every time.",
 		"💬  Live Chat - Talk with other fans during concerts.",
-		"🎤  Sing-Along Mode - Follow the lyrics and sing your heart out.",
-		"🤖  AI Avatar Generator - paste your ideal avatar with concert outfit",
+		"🎤  Sing-Along Mode - Follow the lyrics and sing out loud.",
+		"🤖  AI Avatar Lab - Create your custom concert identity.",
 	]
 	for line : String in features:
 		var lbl := Label.new()

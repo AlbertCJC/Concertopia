@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://coit0458eg2l2"]
+
+[ext_resource type="Script" uid="uid://cx8oh0op71g7s" path="res://scripts/vault.gd" id="1_knnfl"]
+
+[node name="vault" type="Control" unique_id=780140202]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_knnfl")

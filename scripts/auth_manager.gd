@@ -76,6 +76,7 @@ signal password_changed()
 signal password_change_failed(reason: String)
 
 signal oauth_login_started(provider: String)
+signal profile_updated()
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Lifecycle
@@ -122,7 +123,10 @@ func register(email: String, password: String, display_name: String = "") -> voi
 	var body = {
 		"email": _pending_verify_email,
 		"password": password,
-		"data": { "display_name": display_name if !display_name.is_empty() else _pending_verify_email.split("@")[0] }
+		"data": { 
+			"display_name": display_name if !display_name.is_empty() else _pending_verify_email.split("@")[0],
+			"avatar_credits": 5
+		}
 	}
 	_send_request(_auth_http, SUPABASE_URL + ENDPOINT_SIGNUP, _get_headers(), HTTPClient.METHOD_POST, body)
 
@@ -156,33 +160,23 @@ func fetch_profile() -> void:
 func update_user_details(details: Dictionary) -> void:
 	if user_id.is_empty(): return
 	
-	# Update locally immediately so UI is snappy
+	# Update locally immediately
 	for key in details:
 		current_user[key] = details[key]
+	
+	# Construct payload dynamically. 
+	# PostgREST 400 Bad Request happens if we send columns that don't exist.
+	# We'll send the primary keys and the provided details.
+	var payload = { "id": user_id }
+	for key in details:
+		payload[key] = details[key]
 		
-	# PostgREST Upsert: POST to the table endpoint without query params.
 	var url = SUPABASE_URL + REST_PROFILES
-	
-	# Create a payload of ONLY the columns that exist in the profiles table
-	# to avoid PostgREST errors, ensuring we send ALL known data so we don't 
-	# accidentally overwrite existing columns with NULL during the upsert.
-	var payload = {
-		"id": user_id,
-		"display_name": current_user.get("display_name", ""),
-		"email": current_user.get("email", ""),
-		"full_name": current_user.get("full_name", ""),
-		"bio": current_user.get("bio", ""),
-		"avatar_url": current_user.get("avatar_url", "")
-	}
-	
-	# Only include age if it's a valid integer
-	var age = current_user.get("age", 0)
-	if str(age).is_valid_int() and int(age) > 0:
-		payload["age"] = int(age)
-		
 	var headers = _get_headers(access_token)
 	headers.append("Prefer: resolution=merge-duplicates, return=representation")
 	_send_request(_db_http, url, headers, HTTPClient.METHOD_POST, payload)
+	_save_session()
+	profile_updated.emit()
 
 func send_reset_code(email: String) -> void:
 	email = email.strip_edges().to_lower()
@@ -391,7 +385,16 @@ func _schedule_refresh(seconds: int) -> void:
 	_refresh_timer.start(wait_time)
 
 func _save_session() -> void:
-	var data = {"access_token": access_token, "refresh_token": refresh_token, "user_id": user_id, "email": current_user.get("email", ""), "expires_at": expires_at}
+	var data = {
+		"access_token": access_token, 
+		"refresh_token": refresh_token, 
+		"user_id": user_id, 
+		"email": current_user.get("email", ""), 
+		"expires_at": expires_at,
+		"avatar_history": current_user.get("avatar_history", []),
+		"nft_history": current_user.get("nft_history", []),
+		"last_reward_date": current_user.get("last_reward_date", "")
+	}
 	var file = FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file: file.store_string(JSON.stringify(data))
 
@@ -404,13 +407,10 @@ func _load_session() -> void:
 	access_token = data.get("access_token", ""); refresh_token = data.get("refresh_token", ""); user_id = data.get("user_id", ""); expires_at = data.get("expires_at", 0)
 	current_user["email"] = data.get("email", ""); current_user["id"] = user_id
 	
-	if not access_token.is_empty():
-		var now = Time.get_unix_time_from_system()
-		if now < expires_at - 60:
-			_schedule_refresh(expires_at - int(now))
-			session_restored.emit(current_user)
-		else: 
-			refresh_session()
+	# Load history and rewards from local fallback
+	if data.has("avatar_history"): current_user["avatar_history"] = data["avatar_history"]
+	if data.has("nft_history"): current_user["nft_history"] = data["nft_history"]
+	if data.has("last_reward_date"): current_user["last_reward_date"] = data["last_reward_date"]
 
 func _clear_session() -> void:
 	access_token = ""; refresh_token = ""; user_id = ""; expires_at = 0; current_user = {}; _refresh_timer.stop()
@@ -422,3 +422,43 @@ func needs_profile_completion() -> bool:
 func needs_avatar_generation() -> bool:
 	var val = current_user.get("avatar_url")
 	return val == null or str(val).is_empty()
+
+## ── Enhancement Helpers ──
+
+## Record a newly generated avatar URL into history
+func add_to_avatar_history(url: String) -> void:
+	var history : Array = current_user.get("avatar_history", [])
+	if not url in history:
+		history.push_front(url)
+		if history.size() > 20: history.pop_back() # Keep last 20
+		update_user_details({"avatar_history": history})
+
+## Record a newly minted NFT into history
+func add_to_nft_history(nft_data: Dictionary) -> void:
+	var history : Array = current_user.get("nft_history", [])
+	history.push_front(nft_data)
+	if history.size() > 50: history.pop_back()
+	update_user_details({"nft_history": history})
+
+## Check if user is eligible for a daily reward
+func is_daily_reward_available() -> bool:
+	var today = Time.get_date_string_from_system()
+	var last_date = current_user.get("last_reward_date", "")
+	return today != last_date
+
+## Claim the daily reward
+func claim_daily_reward() -> bool:
+	if not is_daily_reward_available():
+		return false
+		
+	var today = Time.get_date_string_from_system()
+	var credits = current_user.get("avatar_credits", 0)
+	current_user["avatar_credits"] = credits + 1
+	current_user["last_reward_date"] = today
+	
+	# Update database and local session
+	update_user_details({
+		"avatar_credits": current_user["avatar_credits"],
+		"last_reward_date": today
+	})
+	return true

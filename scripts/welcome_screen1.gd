@@ -3,6 +3,9 @@ extends Control
 const NEXT_SCENE : String = "res://screens/welcome_screen2.tscn"
 
 func _ready() -> void:
+	# Clean slate in case the .tscn had legacy nodes
+	for child in get_children():
+		child.queue_free()
 	_build_ui()
 
 func _build_ui() -> void:
@@ -11,10 +14,20 @@ func _build_ui() -> void:
 	) as FontFile
 
 	var bg := ColorRect.new()
-	bg.color        = Color(0, 0, 0)
+	bg.color        = Color(0.04, 0.03, 0.10) # Using C_BG from other scripts
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
+	
+	# Optional: Add the same pixel grid as Vault
+	var grid := TextureRect.new()
+	grid.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	grid.stretch_mode = TextureRect.STRETCH_TILE
+	grid.modulate.a = 0.05
+	var img := Image.create(2, 2, false, Image.FORMAT_RGBA8)
+	img.set_pixel(0, 0, Color.WHITE); img.set_pixel(1, 1, Color.WHITE)
+	grid.texture = ImageTexture.create_from_image(img)
+	add_child(grid)
 
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -27,7 +40,7 @@ func _build_ui() -> void:
 
 	var centre := VBoxContainer.new()
 	centre.alignment    = BoxContainer.ALIGNMENT_CENTER
-	centre.add_theme_constant_override("separation", 8)
+	centre.add_theme_constant_override("separation", 12)
 	centre.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	margin.add_child(centre)
 
@@ -45,19 +58,19 @@ func _build_ui() -> void:
 	logo.text = "ConcerTopia"
 	logo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	logo.add_theme_color_override("font_color", Color(1, 1, 1))
-	logo.add_theme_font_size_override("font_size", 52)
+	logo.add_theme_font_size_override("font_size", 46) # Consistency
 	if pixel_font:
 		logo.add_theme_font_override("font", pixel_font)
 	logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	centre.add_child(logo)
 
 	var sp := Control.new()
-	sp.custom_minimum_size = Vector2(0, 10)
+	sp.custom_minimum_size = Vector2(0, 15)
 	sp.mouse_filter        = Control.MOUSE_FILTER_IGNORE
 	centre.add_child(sp)
 
 	var tagline := Label.new()
-	tagline.text = "Reimagining Concerts Through Pixel"
+	tagline.text = "Reimagining Concerts Through Pixel Art"
 	tagline.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	tagline.add_theme_color_override("font_color", Color(0.96, 0.42, 0.62))
 	tagline.add_theme_font_size_override("font_size", 14)

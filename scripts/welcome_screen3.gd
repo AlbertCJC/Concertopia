@@ -4,6 +4,9 @@ const PREV_SCENE         : String = "res://screens/welcome_screen2.tscn"
 const WELCOME_BACK_SCENE : String = "res://screens/welcome_back.tscn"
 
 func _ready() -> void:
+	# Clean slate
+	for child in get_children():
+		child.queue_free()
 	_build_ui()
 
 func _build_ui() -> void:
@@ -12,10 +15,19 @@ func _build_ui() -> void:
 	) as FontFile
 
 	var bg := ColorRect.new()
-	bg.color        = Color(0, 0, 0)
+	bg.color        = Color(0.04, 0.03, 0.10)
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
+	
+	var grid := TextureRect.new()
+	grid.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	grid.stretch_mode = TextureRect.STRETCH_TILE
+	grid.modulate.a = 0.05
+	var img := Image.create(2, 2, false, Image.FORMAT_RGBA8)
+	img.set_pixel(0, 0, Color.WHITE); img.set_pixel(1, 1, Color.WHITE)
+	grid.texture = ImageTexture.create_from_image(img)
+	add_child(grid)
 
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -28,7 +40,7 @@ func _build_ui() -> void:
 
 	var centre := VBoxContainer.new()
 	centre.alignment    = BoxContainer.ALIGNMENT_CENTER
-	centre.add_theme_constant_override("separation", 14)
+	centre.add_theme_constant_override("separation", 18)
 	centre.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	margin.add_child(centre)
 
@@ -43,7 +55,7 @@ func _build_ui() -> void:
 	centre.add_child(logo)
 
 	var heading := Label.new()
-	heading.text = "Let's Get You on\nStage!"
+	heading.text = "Let's Get You on Stage!"
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	heading.add_theme_color_override("font_color", Color(0.96, 0.42, 0.62))
 	heading.add_theme_font_size_override("font_size", 26)
@@ -53,7 +65,7 @@ func _build_ui() -> void:
 	centre.add_child(heading)
 
 	var body := Label.new()
-	body.text = "\"Step into a new world of music! Choose your\nfavorite artist, enjoy random tracks, and connect\nwith fans worldwide - all in vibrant pixel art.\""
+	body.text = "\"Step into a new world of music! Choose your favorite artist, enjoy random tracks, and connect with fans worldwide - all in vibrant pixel art.\""
 	body.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	body.autowrap_mode        = TextServer.AUTOWRAP_WORD_SMART
 	body.add_theme_color_override("font_color", Color(1, 1, 1))

@@ -22,6 +22,8 @@ FirstLaunch="*res://scripts/first_launch.gd"
 ScreenTransition="*res://scripts/screen_transition.gd"
 RoomRegistry="*res://scripts/room_registry.gd"
 OAuthServer="*res://scripts/oauth_server.gd"
+AudioManager="*res://scripts/audio_manager.gd"
+UIUtils="*res://scripts/ui_utils.gd"
 
 [display]
 

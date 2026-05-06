@@ -11,10 +11,19 @@ func _build_ui() -> void:
 	) as FontFile
 
 	var bg := ColorRect.new()
-	bg.color        = Color(0, 0, 0)
+	bg.color        = Color(0.04, 0.03, 0.10)
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
+	
+	var grid := TextureRect.new()
+	grid.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	grid.stretch_mode = TextureRect.STRETCH_TILE
+	grid.modulate.a = 0.05
+	var img := Image.create(2, 2, false, Image.FORMAT_RGBA8)
+	img.set_pixel(0, 0, Color.WHITE); img.set_pixel(1, 1, Color.WHITE)
+	grid.texture = ImageTexture.create_from_image(img)
+	add_child(grid)
 
 	var centre := VBoxContainer.new()
 	centre.alignment = BoxContainer.ALIGNMENT_CENTER

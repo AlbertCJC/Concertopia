@@ -150,7 +150,8 @@ func _on_login_success(_user: Dictionary) -> void:
 	elif AuthManager.needs_avatar_generation():
 		get_tree().change_scene_to_file.call_deferred("res://screens/avatar_generation.tscn")
 	else:
-		get_tree().change_scene_to_file.call_deferred(WELCOME1_SCENE)
+		# Existing user, show welcome back
+		get_tree().change_scene_to_file.call_deferred("res://screens/welcome_back.tscn")
 
 func _on_signup_success(_user: Dictionary) -> void:
 	login_button.disabled = false
@@ -238,6 +239,7 @@ func _ensure_error_label() -> void:
 	error_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	error_label.add_theme_color_override("font_color", Color(1, 0.3, 0.3))
 	error_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	error_label.custom_minimum_size = Vector2(300, 0)
 	error_label.visible = false
 	add_child(error_label)
 	move_child(error_label, login_button.get_index())

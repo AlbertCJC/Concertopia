@@ -3,6 +3,7 @@ extends VBoxContainer
 @onready var email_field: LineEdit = $Email
 @onready var submit_button: Button = $"Log In2"
 @onready var cancel_button: Button = $"Log In3"
+@onready var continue_label: Label = $"Log In2/continue"
 var error_label: Label = null
 var info_label: Label = null
 
@@ -27,6 +28,7 @@ func _ensure_labels() -> void:
 	error_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	error_label.add_theme_color_override("font_color", Color(1, 0.3, 0.3))
 	error_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	error_label.custom_minimum_size = Vector2(300, 0)
 	error_label.visible = false
 	add_child(error_label)
 	move_child(error_label, submit_button.get_index())
@@ -36,6 +38,7 @@ func _ensure_labels() -> void:
 	info_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	info_label.add_theme_color_override("font_color", Color(0.4, 1.0, 0.5))
 	info_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	info_label.custom_minimum_size = Vector2(300, 0)
 	info_label.visible = false
 	add_child(info_label)
 	move_child(info_label, submit_button.get_index())
@@ -64,6 +67,7 @@ func _on_code_sent(email: String, _code: String) -> void:
 	submit_button.text = "Submit"
 	info_label.text = "OTP sent to %s" % email
 	info_label.visible = true
+	continue_label.visible = false
 	await get_tree().create_timer(2.0).timeout
 	get_tree().change_scene_to_file.call_deferred(INPUT_CODE_SCENE)
 
@@ -81,6 +85,7 @@ func _show_error(message: String) -> void:
 		return
 	error_label.text    = message
 	error_label.visible = not message.is_empty()
+	continue_label.visible = message.is_empty() and not info_label.visible
 
 func _exit_tree() -> void:
 	if AuthManager.reset_code_sent.is_connected(_on_code_sent):
